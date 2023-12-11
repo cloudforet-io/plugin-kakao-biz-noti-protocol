@@ -1,0 +1,1 @@
+# plugin-kakao-biz-noti-protocol
