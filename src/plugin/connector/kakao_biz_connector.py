@@ -8,13 +8,14 @@ from plugin.error.https import ERROR_CLIENT_REQUEST_FAILED, ERROR_SERVER_FAILED
 
 _LOGGER = logging.getLogger(__name__)
 
+_DEFAULT_URL = f"https://api.megabird.co.kr:8080/v1/openapi"
+
 
 class KakaoBizConnector(BaseConnector):
     def send_message(self, data: dict, headers: dict) -> None:
-        url = f"https://api.megabird.co.kr:8080/v1/openapi/friendtalk/send"
+        url = f"{_DEFAULT_URL}/alimtalk/send"
         res = requests.post(url, data=json.dumps(data), headers=headers)
-
-        if res.status_code != 201:
+        if res.status_code != 200:
             self._handle_https_error(res.status_code, res.text)
 
     @staticmethod

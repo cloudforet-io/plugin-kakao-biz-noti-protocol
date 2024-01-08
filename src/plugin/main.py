@@ -60,16 +60,25 @@ def notification_dispatch(params: dict) -> None:
         None
     """
     channel_data = params["channel_data"]
-    secret_data = params["secret_data"]
-    if not (phone_number := channel_data.get("phone_number")):
-        raise ERROR_REQUIRED_PARAMETER(key="channel_data.phone_number")
-
-    phone_numbers = phone_number.replace(" ", "").split(",")
-    phone_numbers = [phone_number for ph in phone_numbers if ph != ""]
     message = params["message"]
     notification_type = params["notification_type"]
+    secret_data = params["secret_data"]
+    sender = secret_data.get("sender", "@spaceone")
+    template_id = secret_data.get("template_id", "TKA0000649")
     access_key = secret_data.get("access_key")
+    phone_number = channel_data.get("phone_number")
+
+    if phone_number is None:
+        raise ERROR_REQUIRED_PARAMETER(key="channel_data.phone_number")
+
+    filtered_phone_numbers = filter(lambda x: x.strip() != "", phone_number.split(","))
+    phone_numbers = list(map(lambda x: x.strip(), filtered_phone_numbers))
 
     notification_manager = NotificationManager()
+    notification_manager.dispatch(
+        sender, phone_numbers, access_key, message, template_id
+    )
 
-    notification_manager.dispatch(phone_numbers, access_key, message, notification_type)
+
+def _parse_phone_number(phone_number: str) -> str:
+    return phone_number.replace(" ", "")

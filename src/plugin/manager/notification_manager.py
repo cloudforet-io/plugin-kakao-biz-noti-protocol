@@ -11,29 +11,26 @@ _LOGGER = logging.getLogger("spaceone")
 class NotificationManager(BaseManager):
     def dispatch(
         self,
+        sender: str,
         phone_numbers: list,
         access_key: str,
         message: dict,
-        notification_type: str,
+        template_id: str,
     ) -> None:
-        message_manager = MessageManager()
-
-        title = message["title"]
-        description = message.get("description")
-        image_url = message.get("image_url")
+        link = message.get("link", "")
         tags = message.get("tags", [])
+
+        message_manager = MessageManager()
+        message_manager.set_message_values(sender, template_id)
+
         self.parse_occurred_at(message, tags)
-        message_manager.set_receivers(
-            phone_numbers, title, notification_type, description, image_url, tags
-        )
+        message_manager.set_receivers(phone_numbers, link, tags)
 
         headers = {
             "Authorization": access_key,
             "Content-Type": "application/json",
         }
-
         kakao_biz_connector = KakaoBizConnector()
-        print(message_manager.message)
         kakao_biz_connector.send_message(message_manager.message, headers)
 
     @staticmethod
