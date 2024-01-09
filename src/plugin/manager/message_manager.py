@@ -28,17 +28,6 @@ class MessageManager(BaseManager):
             "var3Vl": "링크",
         }
 
-        # """
-        # template for 친구톡
-        # """
-        # self._message = {
-        #     "chnId": "@spaceone",
-        #     "msgCotn": "",
-        #     "subTxtEntprNm": "메가버드",
-        #     "subTxtUseYn": "N",
-        #     "messageReceiverList": [],
-        # }
-
     @property
     def message(self) -> dict:
         return self._message
@@ -47,31 +36,29 @@ class MessageManager(BaseManager):
         self._message["chnId"] = sender
         self._message["tmplId"] = template_id
 
-    def set_receivers(self, phone_numbers: list, link: str, tags: list) -> None:
-        project_name, webhook_name = self._process_tags(tags)
+    def set_message_content(self, phone_numbers: list, link: str, tags: list) -> None:
+        project_name, webhook_name, url_link = self._set_message_variables(tags, link)
+
         for phone_number in phone_numbers:
             receiver = {
                 "mbnum": phone_number,
                 "var1Vl": project_name,
                 "var2Vl": webhook_name,
-                "var3Vl": link,
+                "var3Vl": url_link,
             }
             self._message["messageReceiverList"].append(receiver)
 
     @staticmethod
-    def _process_tags(tags):
-        project_name = ""
-        webhook_name = ""
-        webhook_exists = False
+    def _set_message_variables(tags, link):
+        project_name = "내부"
+        webhook_name = "내부 시스템"
+        link = link if link else "관리자에게 문의하세요"
         for tag in tags:
             if tag["key"] == "Project":
                 project_name = tag["value"]
             if tag["key"] == "Triggered by":
-                webhook_exists = True
                 webhook_name = tag["value"]
-        if not webhook_exists:
-            webhook_name = "내부 시스템"
-        return project_name, webhook_name
+        return project_name, webhook_name, link
 
     # def _set_link(self, link):
     #     link_content = f"{LINK_CONTENT}: {link}"
