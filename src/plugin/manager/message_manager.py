@@ -1,16 +1,5 @@
 from spaceone.core.manager import BaseManager
 
-# NOTIFICATION_TYPE_MAP = {
-#     "INFO": "#43BEFF",
-#     "ERROR": "#FF6A6A",
-#     "SUCCESS": "#60B731",
-#     "WARNING": "#FFCE02",
-#     "DEFAULT": "#858895",
-# }
-
-MAIN_MAX_LENGTH = 1000
-DESCRIPTION_MAX_LENGTH = 600
-
 
 class MessageManager(BaseManager):
     def __init__(self, *args, **kwargs):
@@ -32,7 +21,7 @@ class MessageManager(BaseManager):
     def message(self) -> dict:
         return self._message
 
-    def set_message_values(self, sender, template_id) -> None:
+    def set_message_values(self, sender: str, template_id: str) -> None:
         self._message["chnId"] = sender
         self._message["tmplId"] = template_id
 
@@ -49,7 +38,7 @@ class MessageManager(BaseManager):
             self._message["messageReceiverList"].append(receiver)
 
     @staticmethod
-    def _set_message_variables(tags, link):
+    def _set_message_variables(tags: list, link: str) -> tuple:
         project_name = "내부"
         webhook_name = "내부 시스템"
         link = link if link else "관리자에게 문의하세요"
@@ -59,12 +48,6 @@ class MessageManager(BaseManager):
             if tag["key"] == "Triggered by":
                 webhook_name = tag["value"]
         return project_name, webhook_name, link
-
-    # def _set_link(self, link):
-    #     link_content = f"{LINK_CONTENT}: {link}"
-    #     if len(link_content) > VAR_MAX_LENGTH:
-    #         link_content = ""
-    #     return link_content
 
     @staticmethod
     def _truncate_string(target_string: str, limit_length: int) -> str:
