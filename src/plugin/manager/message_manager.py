@@ -1,4 +1,5 @@
 from spaceone.core.manager import BaseManager
+from pyshorteners import Shortener
 
 
 class MessageManager(BaseManager):
@@ -26,7 +27,8 @@ class MessageManager(BaseManager):
         self._message["tmplId"] = template_id
 
     def set_message_content(self, phone_numbers: list, link: str, tags: list) -> None:
-        project_name, webhook_name, url_link = self._set_message_variables(tags, link)
+        project_name, webhook_name = self._set_message_variables(tags)
+        url_link = self._shorten_url(link) if link else "관리자에게 문의하세요"
 
         for phone_number in phone_numbers:
             receiver = {
@@ -38,16 +40,15 @@ class MessageManager(BaseManager):
             self._message["messageReceiverList"].append(receiver)
 
     @staticmethod
-    def _set_message_variables(tags: list, link: str) -> tuple:
+    def _set_message_variables(tags: list) -> tuple:
         project_name = "내부"
         webhook_name = "내부 시스템"
-        link = link if link else "관리자에게 문의하세요"
         for tag in tags:
             if tag["key"] == "Project":
                 project_name = tag["value"]
             if tag["key"] == "Triggered by":
                 webhook_name = tag["value"]
-        return project_name, webhook_name, link
+        return project_name, webhook_name
 
     @staticmethod
     def _truncate_string(target_string: str, limit_length: int) -> str:
@@ -55,3 +56,9 @@ class MessageManager(BaseManager):
             ceiling = limit_length - 4
             return target_string[:ceiling] + "..."
         return target_string
+
+    @staticmethod
+    def _shorten_url(link: str) -> str:
+        shortener = Shortener()
+        shortened_link = shortener.tinyurl.short(link)
+        return shortened_link
