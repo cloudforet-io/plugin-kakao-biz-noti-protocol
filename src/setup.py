@@ -30,6 +30,6 @@ setup(
     author_email="admin@cloudforet.io",
     license="Apache License 2.0",
     packages=find_packages(),
-    install_requires=["spaceone-api", "PyJWT", "requests", "pyshorteners"],
+    install_requires=["spaceone-api", "PyJWT", "requests"],
     zip_safe=False,
 )

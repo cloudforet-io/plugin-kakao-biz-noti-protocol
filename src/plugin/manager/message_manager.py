@@ -1,5 +1,4 @@
 from spaceone.core.manager import BaseManager
-from pyshorteners import Shortener
 
 
 class MessageManager(BaseManager):
@@ -59,6 +58,6 @@ class MessageManager(BaseManager):
 
     @staticmethod
     def _shorten_url(link: str) -> str:
-        shortener = Shortener()
-        shortened_link = shortener.tinyurl.short(link)
+        split_link = link.split("/alert/")
+        shortened_link = split_link[0] + "/alert"
         return shortened_link
